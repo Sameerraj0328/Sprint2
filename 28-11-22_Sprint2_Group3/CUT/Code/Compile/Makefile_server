@@ -1,0 +1,29 @@
+SRCDIR = src
+INCLUDEDIR = include
+OBJDIR = obj
+BINDIR = bin
+VALGRIND = tools/valgrind
+
+INCLUDEFLAGS = -I${INCLUDEDIR}
+CPPFLAGS = -ansi -c -g -Wall -std=gnu++11 -DDEBUG ${INCLUDEFLAGS}
+
+msg_server: common.o msg_server.o msg_server_main.o 
+	g++ -o ${BINDIR}/msg_server ${OBJDIR}/common.o ${OBJDIR}/msg_server.o ${OBJDIR}/msg_server_main.o -lpthread -lrt
+
+msg_server_main.o: ${SRCDIR}/msg_server_main.cpp
+	g++ -o ${OBJDIR}/msg_server_main.o ${CPPFLAGS} ${SRCDIR}/msg_server_main.cpp
+
+
+msg_server.o: ${SRCDIR}/msg_server.cpp
+	g++ -o ${OBJDIR}/msg_server.o ${CPPFLAGS} ${SRCDIR}/msg_server.cpp
+
+common.o: ${SRCDIR}/common.cpp
+	g++ -o ${OBJDIR}/common.o ${CPPFLAGS} ${SRCDIR}/common.cpp
+
+valgrind:${BIN}/msg_server
+	valgrind --leak-check=full --show-reachable=yes ${BINDIR}/msg_server 2>${VALGRIND}/valgrind.txt
+
+clean:
+	echo "cleaning up .o and .exes"
+	rm ${BINDIR}/msg_server ${OBJDIR}/*.o
+
